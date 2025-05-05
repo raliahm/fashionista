@@ -96,51 +96,42 @@ loadCategories(); // Call the function to load categories
     
     // Function to filter products based on selected categories and search term
     // and price range
-    function filterProducts() {
+    async function filterProducts() {
       const selectedCategoryIds = [...document.querySelectorAll('.type-filter:checked')].map(cb => cb.value);
       const searchTerm = searchBar.value.toLowerCase();
       const minPrice = parseFloat(document.getElementById('min-price').value) || 0;
       const maxPrice = parseFloat(document.getElementById('max-price').value) || Infinity;
     
-      let filteredProducts = [];
+      let allProducts = [];
     
-        // Apply search term filter
+      try {
         if (searchTerm) {
-          fetch(`http://localhost:3000/api/product/search/${searchTerm}`)
-            .then(response => response.json())
-            .then(data => {
-              filteredProducts = data; // Set the fetched products based on the search term
-            })
-            .catch(error => console.error('Error fetching products by search term:', error));
+          const res = await fetch(`http://localhost:3000/api/product/search/${searchTerm}`);
+          const data = await res.json();
+          allProducts = data;
+        } else if (selectedCategoryIds.length > 0) {
+          const allPromises = selectedCategoryIds.map(id =>
+            fetch(`http://localhost:3000/api/product/category/${id}`).then(res => res.json())
+          );
+          const categoryResults = await Promise.all(allPromises);
+          allProducts = categoryResults.flat();
+        } else {
+          const res = await fetch('http://localhost:3000/api/product/all');
+          allProducts = await res.json();
         }
-      // Fetch products based on selected categories
-      if (selectedCategoryIds.length > 0) {
-        const categoryPromises = selectedCategoryIds.map(categoryId => {
-          return fetch(`http://localhost:3000/api/product/category/${categoryId}`)
-            .then(response => response.json())
-            .then(data => {
-              filteredProducts = filteredProducts.concat(data); // Combine all categories
-            })
-            .catch(error => console.error('Error fetching category products:', error));
-        });
     
-        // After fetching all category-based products, apply the price filter
-        Promise.all(categoryPromises).then(() => {
-          filterByPrice(filteredProducts, minPrice, maxPrice);
-        });
-      } else {
-        // If no category selected, apply only price filter
-        fetch('http://localhost:3000/api/product/all')
-          .then(response => response.json())
-          .then(data => {
-            filterByPrice(data, minPrice, maxPrice);
-          })
-          .catch(error => console.error('Error fetching all products:', error));
+        // Then apply price filter client-side (API-based filter is optional)
+        const filtered = allProducts.filter(product =>
+          product.ProductPrice >= minPrice && product.ProductPrice <= maxPrice
+        );
+    
+        renderProducts(filtered);
+    
+      } catch (err) {
+        console.error('Error filtering products:', err);
       }
-
-    
-
     }
+    
     
     // Function to filter products by price using /products/filter API endpoint
     function filterByPrice(products, minPrice, maxPrice) {
@@ -156,38 +147,8 @@ loadCategories(); // Call the function to load categories
         .catch(error => console.error('Error filtering products by price:', error));
     }
     
-    // Function to render products
-    function renderProducts(filtered) {
-      container.innerHTML = "";
-      if (filtered.length === 0) {
-        container.innerHTML = "<h2>No products found.</h2>";
-        return;
-      }
-      filtered.forEach(product => {
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        card.innerHTML = `
-          <img src="${product.ProductImageURL}" alt="${product.ProductName}">
-          <h3>${product.ProductName}</h3>
-          <p class="price">$ ${product.ProductPrice}</p>
-        `;
-        const button = document.createElement('button');
-        button.textContent = 'Add to Cart';
-        button.addEventListener('click', () => addToCart(product));  // Add to Cart
-        card.appendChild(button);
-        card.onclick = () => {
-          // Redirect to details page
-          window.location.href = `/details?id=${encodeURIComponent(product.ProductID)}`;
-        };
+   
     
-        container.appendChild(card);
-      });
-    }
-    
-    // Event listeners for filters
-    document.querySelectorAll('.type-filter').forEach(cb => {
-      cb.addEventListener('change', filterProducts);
-    });
     
     searchBar.addEventListener('input', filterProducts);
     document.getElementById('min-price').addEventListener('input', filterProducts);

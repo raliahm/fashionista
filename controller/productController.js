@@ -82,8 +82,10 @@ exports.removeProductFromCart = (req, res) => {
 exports.clearCart = (req, res) => {
     console.log("clear cart called");
     console.log(req.params.cartId);
+    console.log(req.params.CartStatus);
     const cartId = req.params.cartId;
-    productModel.clearCart(cartId, (err, result) => {
+    const cartStatus = req.params.CartStatus;
+    productModel.clearCart(cartId, cartStatus, (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json(result);
     });
@@ -197,5 +199,13 @@ exports.filterProductsByPrice = (req, res) => {
     productModel.filterProductsByPrice(minPrice, maxPrice, (err, products) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json(products);
+    });
+};
+
+exports.getCartTotalQuantity = (req, res) => {
+    const cartId = req.params.cartId;
+    productModel.getCartTotalQuantity(cartId, (err, totalQuantity) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(totalQuantity);
     });
 };

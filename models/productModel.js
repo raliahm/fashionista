@@ -93,23 +93,16 @@ module.exports = {
     },
     addProductToCart: (cartId, productId, quantity, cb) => {
         const insertSql = 'INSERT INTO CartProducts (CartID, ProductID, Quantity) VALUES (?, ?, ?)';
-        const updateStatusSql = 'UPDATE Carts SET CartStatus = ? WHERE CartID = ?';
     
         db.run(insertSql, [cartId, productId, quantity], function (err) {
             if (err) {
                 console.error(err.message);
                 cb(err, null);
             } else {
-                // Set cart status to 'active'
-                db.run(updateStatusSql, ['active', cartId], function (statusErr) {
-                    if (statusErr) {
-                        console.error(statusErr.message);
-                        cb(statusErr, null);
-                    } else {
-                        cb(null, { id: this.lastID, cartId, status: 'active' });
-                    }
-                });
-            }
+                        cb(null, { id: this.lastID, cartId: this.cartId, productId: this.productId, quantity: this.quantity 
+                            
+                        });
+            }    
         });
     },    
     //get all products in cart
@@ -197,9 +190,8 @@ module.exports = {
     },
     // update product quantity in cart
     updateProductQuantityInCart: (cartId, productId, quantity, cb) => {
-        const CartStatus = 'active';
-        const sql = 'UPDATE CartProducts SET Quantity = ? WHERE CartID = ? AND ProductID = ? AND CartStatus=? ';
-        db.run(sql, [quantity, cartId, productId, CartStatus], function (err) {
+        const sql = 'UPDATE CartProducts SET Quantity = ? WHERE CartID = ? AND ProductID = ?';
+        db.run(sql, [quantity, cartId, productId], function (err) {
             if (err) {
                 console.error(err.message);
                 cb(err, null);
@@ -225,12 +217,12 @@ module.exports = {
                     cb(err, null);
                 } else {
                     const orderId = this.lastID;
-                    db.run(updateSql, ['completed', cartId], function (updateErr) {
+                    db.run(updateSql, ['purchased', cartId], function (updateErr) {
                         if (updateErr) {
                             console.error(updateErr.message);
                             cb(updateErr, null);
                         } else {
-                            cb(null, { orderId, cartStatus: 'completed' });
+                            cb(null, { orderId, cartStatus: 'purchased' });
                         }
                     });
                 }
@@ -284,5 +276,17 @@ module.exports = {
                 cb(null, rows);
             }
         });
-    }  
+    },
+    //get quantity of products in cart
+    getCartTotalQuantity: (cartId, cb) => {
+        const sql = 'SELECT SUM(Quantity) AS TotalQuantity FROM CartProducts WHERE CartID = ?';
+        db.get(sql, [cartId], (err, row) => {
+            if (err) {
+                console.error(err.message);
+                cb(err, null);
+            } else {
+                cb(null, row.TotalQuantity);
+            }
+        });
+    },
 }

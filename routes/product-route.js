@@ -16,13 +16,13 @@ router.delete('/product/delete/:id', controller.deleteProduct);
 
 
 router.get('/product/search/:keyword', controller.searchProductsByKeyword);
-router.delete('/cart/clear/:cartId', controller.clearCart);
+router.delete('/cart/clear/:cartId/:CartStatus', controller.clearCart);
 router.post('/cart', controller.createCart);
 router.post('/cart/add', controller.addProductToCart);
 router.get('/cart/:cartId', controller.getProductsInCart);
 router.delete('/cart/delete/:cartId/:productId', controller.removeProductFromCart);
 router.get('/cart/total/:cartId', controller.getCartTotal);
-
+router.get('/cart/total-quantity/:cartId', controller.getCartTotalQuantity);
 router.get('/cart/details/:cartId', controller.getCartProductsWithDetails);
 router.get('/cart/details-total/:cartId', controller.getCartProductsWithDetailsAndTotal);
 router.put('/cart/update/:cartId/:productId', controller.updateProductQuantityInCart);

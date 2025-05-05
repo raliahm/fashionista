@@ -2,7 +2,7 @@ function renderProduct() {
   const container = document.getElementById('detail-container');
   const urlParams = new URLSearchParams(window.location.search);
   const productID = urlParams.get('id');
-
+  console.log(productID);
   fetch(`http://localhost:3000/api/product/${productID}`)
     .then(response => response.json())
     .then(product => {
@@ -39,3 +39,6 @@ function renderProduct() {
 }
 
 renderProduct();
+
+
+
