@@ -83,14 +83,14 @@ loadCategories(); // Call the function to load categories
         card.appendChild(button);
         card.onclick = () => {
           // redirect to details page
-          window.location.href = `/details?name=${encodeURIComponent(product.ProductName)}`;
+          window.location.href = `/details?id=${encodeURIComponent(product.ProductID)}`;
         };
     
         container.appendChild(card);
       });
     }
-    function goToDetails(productName) {
-      window.location.href = `/details?name=${encodeURIComponent(productName)}`;
+    function goToDetails(productID) {
+      window.location.href = `/details?id=${encodeURIComponent(productID)}`;
     }
 
     
@@ -177,7 +177,7 @@ loadCategories(); // Call the function to load categories
         card.appendChild(button);
         card.onclick = () => {
           // Redirect to details page
-          window.location.href = `/details?name=${encodeURIComponent(product.ProductName)}`;
+          window.location.href = `/details?id=${encodeURIComponent(product.ProductID)}`;
         };
     
         container.appendChild(card);
