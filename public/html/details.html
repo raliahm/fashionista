@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="css/homepage.css">
+  <title>Fashionista Nails - product detail</title>
+</head>
+<header>
+  <h1>FASHIONISTA NAILS</h1>
+  <nav>
+      <a href="homepage">Home</a>
+      <a href="products">Products</a>
+      <a href="details">Details</a>
+      <a href="shopping-cart">shopping cart</a>
+      <a href="admin">Admin portal</a>
+  </nav>
+</header>
+<body>
+    
+  <div class="detail-layout">
+    <div id="detail-container">
+
+      
+    </div>
+    <div class="right" id="cart">
+      <div class="cart-header-container">
+         <button id="cart-toggle" >Shopping Cart</button>
+      </div>
+      <!-- Cart container, hidden initially -->
+      <div id="cart-container" style="display: none;">
+        <div id="cart-count" ></div>
+         <!-- Cart items will be dynamically added here -->
+        <div id="cart-total"></div> <!-- Cart total will be inside the cart container -->
+        <div id="clear-cart" style="display: none;;"></div>
+      </div> 
+      
+    </div>
+  </div>
+  <script src="js/product.js"></script>
+  <script src="js/details.js"></script>
+  <script src="js/cart.js"></script>
+</body>
+<footer>
+<a href="../index.html">Home</a>
+</footer>
+</html>

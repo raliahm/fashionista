@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+     <link rel="stylesheet" href="css/admin.css">
+  </head>
+  <body>
+    <nav class="navbar">
+        <div class="logo">Fashionista Nails Admin Center</div>
+        <ul class="nav-links">
+            <li><a href="homepage">Customer site</a></li>
+            <li><a href="shopping-cart.html">Shopping Cart</a></li>
+            <li><a href="product-upload">Upload</a></li>
+            <li><a href="product-listing">Listing</a></li>
+            <li><a href="product-edit">Edit</a></li>
+            <li><a href="admin">Login</a></li>
+            <li><a href="logout">Logout</a></li>
+        </ul>
+    </nav>
+<div class="admin-container">
+  <section class="header" >
+    <h1>Bulk Product Upload</h1>
+    <p>Add all the products in a file</p>
+  </section>
+  <div>
+  </div>
+  <section class="form-body">
+     <form action="upload-handler.php" method="POST" enctype="multipart/form-data">
+            <label for="file-upload">Select a file:</label>
+            <input type="file" id="file-upload" name="file" accept=".json, .csv, .txt" required> <br>
+            <button type="submit" class="upload-btn">Upload File</button>
+      </form>
+  </section>
+ 
+  <section class="instructions">
+            <h2>Instructions</h2> <br>
+            <p>Ensure that your file follows the correct format. <br> We accept:</p>
+            <ul>
+                <li>**JSON files**: Structured data format</li>
+                <li>**CSV files**: Comma-separated values</li>
+                <li>**TXT files**: Simple text-based format</li>
+            </ul>
+   </section>
+   <!-- Example File Format -->
+        <section class="example-format">
+            <h3>Example Format</h3>
+            <p>JSON Format Example:</p>
+            <pre>
+      [
+        {
+          "name": "Product 1",
+          "description": "Description of Product 1",
+          "category": "Category A",
+          "image": "uploads/product1.jpg",
+          "price": 19.99,
+          "quantity": 100
+        },
+        {
+          "name": "Product 2",
+          "description": "Description of Product 2",
+          "category": "Category B",
+          "image": "uploads/product2.jpg",
+          "price": 29.99,
+          "quantity": 100
+        },
+        {
+          "name": "Product 3",
+          "description": "Description of Product 3",
+          "category": "Category C",
+          "image": "uploads/product3.jpg",
+          "price": 39.99,
+          "quantity": 100
+        }
+      ]
+
+            </pre>
+        </section>
+</div>
+</body>
+</html>

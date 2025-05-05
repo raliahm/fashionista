@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="css/homepage.css">
+  <title>Fashionista Nails - products</title>
+</head>
+<header>
+  <h1>FASHIONISTA NAILS</h1>
+  <nav>
+      <a href="homepage">Home</a>
+      <a href="products">Products</a>
+      <a href="details">Details</a>
+      <a href="shopping-cart">shopping cart</a>
+      <a href="admin">Admin portal</a>
+      <input type="text" id="search-bar" placeholder="Search products...">
+  </nav>
+</header>
+
+<body>
+  <div class="main-layout">
+    <!-- Filter Sidebar -->
+    <aside class="filter-sidebar">
+      <h2>Filter by Type</h2>
+      <div id="filter-options"></div>
+      <div class="price-filter">
+        <h4>Price Range</h4>
+        <label>
+          Min: <input type="number" id="min-price" placeholder="0">
+        </label>
+        <label>
+          Max: <input type="number" id="max-price" placeholder="500">
+        </label>
+      </div>
+    
+    </aside>
+
+    <!-- Product Container -->
+    <div class="product-container" id="product-container">
+      <!-- Product cards will be rendered here -->
+    </div>
+
+      <div class="right" id="cart">
+        <div class="cart-header-container">
+           <button id="cart-toggle" >Shopping Cart</button>
+        </div>
+        <!-- Cart container, hidden initially -->
+        <div id="cart-container" style="display: none;">
+          <div id="cart-count" ></div>
+           <!-- Cart items will be dynamically added here -->
+          <div id="cart-total"></div> <!-- Cart total will be inside the cart container -->
+          <div id="clear-cart" style="display: none;;"></div>
+        </div> 
+        
+      </div>
+  </div>    
+   
+</body>
+<script src="js/product.js"></script>
+<script src="js/cart.js"></script>
+<footer>
+<a href="../index.html">Home</a>
+</footer>
+
+
+
+</html>

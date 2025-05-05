@@ -1,0 +1,396 @@
+h1 {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 100px;
+    text-align: center;
+    font-weight: bold;
+    color: lightcoral;
+    animation: both;
+  }
+  nav{
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 30px ;
+    text-decoration: none;
+    background-color:  #ffdd94;
+    margin-block: 50pt;
+    text-align: right;
+  }
+  nav a{
+    text-decoration: none;
+    color: black;
+    padding: 5%;
+  }
+  .video-container {
+    height: 40%;
+    width: 100%;
+  }
+  
+  #text-explain {
+    display: flex;
+    flex-direction: row; /* makes them sit side by side */
+    align-items: center;
+    justify-content: center;
+    gap: 40px; /* space between the columns */
+    padding: 20px;
+    flex-wrap: wrap; /* lets it adjust on smaller screens */
+  }
+  
+  .video-column,
+  .text-column {
+    flex: 1;
+    min-width: 300px;
+  }
+  
+  .video-column video {
+    width: 100%;
+    max-width: 500px;
+  }
+  
+  .product-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+  }
+  
+  .product-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    width: 220px;
+    text-align: center;
+    padding: 15px;
+    transition: transform 0.2s ease;
+  }
+  
+  .product-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .product-card img {
+    width: 100%;
+    border-radius: 10px;
+  }
+  
+  .product-card .price {
+    color: #28a745;
+    font-weight: bold;
+  }
+  
+  .product-card button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .product-card button:hover {
+    background-color: #0056b3;
+  }
+  
+  
+  .main-layout {
+    display: flex;
+    min-height: 100vh;
+  }
+  
+  
+  aside {
+    flex: 0 0 15%; /* was maybe 20% or fixed pixels before */
+    padding: 1rem;
+    background-color: #f1f1f1;
+    border-right: 1px solid #ccc;
+  }
+  
+  .filter-sidebar {
+    width: 250px;
+    padding: 20px;
+    background-color: #fff;
+    border-right: 1px solid #ddd;
+  }
+  
+  .filter-sidebar h2, .filter-sidebar h3 {
+    margin-top: 0;
+  }
+  
+  .filter-sidebar label {
+    display: block;
+    margin-bottom: 10px;
+  }
+  
+  #search-bar {
+    width: 100%;
+    padding: 8px;
+    margin-top: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  .price-filter {
+    margin-top: 1rem;
+  }
+  
+  .price-filter input {
+    width: 100%;
+    padding: 0.25rem;
+    margin-top: 0.25rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  
+  
+  #cart h3 {
+    margin-top: 0;
+  }
+  
+  #cart-items li {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+  
+  
+  .cart-container {
+    display: none; /* Initially, the cart is hidden */
+    width: 25%;
+    background-color: #f9f9f9;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  .cart-header-container  #cart-toggle {
+    writing-mode: vertical-rl;
+    transform: rotate(0deg);  /* Initially vertical */
+    text-align: center;
+    padding: 20px;
+    font-weight: bold;
+    background: #222;
+    color: white;
+    height: 50vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 20px;
+    transition: transform 0.3s ease, height 0.3s ease, font-size 0.3s ease, width 0.3s ease;
+    width: auto;
+  }
+  
+  /* When cart is open, rotate and adjust size */
+  .cart-open #cart-toggle {
+  
+    transform: rotate(-90deg);  /* Rotate to horizontal */
+    height: 10vh;
+    font-size: 14px;
+    position:relative;
+    width: 10vh;  /* Maintain square shape */
+    text-align: center;
+    left: 0;
+    bottom: 0;
+  }
+  
+  #cart-toggle:hover {
+    background-color: #0056b3;
+  }
+  /* When the cart is open */
+  .cart-open .container {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .cart-open .product-container {
+    width: 50%; /* Adjust the product section width when cart is open */
+  }
+  
+  .cart-open .cart-container {
+    display: block; /* Show the cart when it is open */
+    width: 50%; /* Cart takes up 50% of the width */
+  }
+  
+  .right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Aligns content to the left */
+  }
+  
+  
+  
+  .clear-item {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    margin-top: 8px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  .detail-layout {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    gap: 20px;
+  }
+  
+  /* Product detail card */
+  .product-details {
+    width: 75%;
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 24px;
+    border-radius: 12px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    text-align: center;
+  }
+  
+  .product-details img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    margin-bottom: 24px;
+  }
+  
+  .product-details h2 {
+    font-size: 2rem;
+    margin: 16px 0;
+    color: #222;
+  }
+  
+  .product-details p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin: 12px 0;
+  }
+  
+  .product-details a {
+    display: inline-block;
+    margin-top: 20px;
+    text-decoration: none;
+    color: #007BFF;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+  
+  .product-details a:hover {
+    color: #0056b3;
+  }
+  
+  
+  /* Button styles */
+  .add-to-cart-btn {
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .add-to-cart-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Shopping cart styles */
+  .right {
+    width: 25%;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  @media (max-width: 768px) {
+    .main-layout {
+      flex-direction: column; /* Stack the sections vertically */
+    }
+  
+    .aside {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+  
+    .product-container {
+      width: 100%;
+    }
+  
+    .cart-container {
+      width: 100%;
+    }
+    #cart-container.cart-open {
+      display: block;  /* Makes the cart visible */
+      /* Optionally add animations for a sliding effect */
+      transition: transform 0.3s ease-in-out;
+      transform: translateX(0);
+  }
+  
+    .cart-open .product-container {
+      width: 100%; /* Full width on mobile */
+    }
+  
+    .cart-open .cart-container {
+      width: 100%; /* Full width on mobile */
+    }
+  }
+  /* Container for checkout button, make it consistent */
+  .cart-checkout-container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 1rem;
+    background-color: #fff0f6;  /* Light pink background */
+    border: 2px solid #ccc;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  /* Checkout button styling to make it consistent */
+  .order {
+    background-color: #ff69b4;
+    color: white;
+    padding: 0.75rem 1.25rem;  /* Adjusted padding for a more compact button */
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    align-self: flex-start;
+    margin-top: 1.5rem;
+    width: 100%;  /* Make it span the full width of the container */
+    text-align: center;  /* Center the text */
+  }
+  
+  /* Hover effect for checkout button */
+  .order:hover {
+    background-color: #ff85c1;
+  }
+  
+  /* Add some space between the checkout button and the cart details */
+  .order + .cart-details {
+    margin-top: 20px;
+  }
+  
+  
+  .checkout-form {
+    background-color: #ffffff;
+    padding: 20px;
+    margin-top: 30px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  
+  /* Responsive styling to ensure the cart-checkout fits well */
+  @media (max-width: 768px) {
+    .cart-checkout-container {
+      width: 100%;  /* Full width for smaller screens */
+    }
+    .cart-checkout {
+      font-size: 0.9rem;  /* Adjust font size for small screens */
+    }
+  }

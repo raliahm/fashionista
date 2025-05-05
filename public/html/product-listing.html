@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="css/admin.css">
+  <title>Admin</title>
+</head>
+  <body>
+        <nav class="navbar">
+        <div class="logo">Fashionista Nails Admin Center</div>
+        <ul class="nav-links">
+            <li><a href="homepage">Customer site</a></li>
+            <li><a href="shopping-cart">Shopping Cart</a></li>
+            <li><a href="product-upload">Upload</a></li>
+            <li><a href="product-listing">Listing</a></li>
+            <li><a href="product-edit">Edit</a></li>
+            <li><a href="admin">Login</a></li>
+            <li><a href="logout">Logout</a></li>
+        </ul>
+    </nav>
+     <div class="admin-container">
+      <section class="header">
+        <h1>Product List</h1> 
+      </section>
+      
+    <section class="instructions">
+         <label for="search">Search Product:</label>
+    <input type="text" id="search" placeholder="Enter product name">
+    <br>
+    <label for="category-filter">Filter by Category:</label>
+
+    <select id="category-filter">
+        <option value="">All Categories</option>
+        <option value="electronics">Electronics</option>
+        <option value="fashion">Fashion</option>
+        <option value="books">Books</option>
+    </select>
+    <br>
+     <button onclick="filterProducts()">Filter</button>
+     <br>
+    </section> 
+   
+    <div class="product-list" id="active-products">
+        <!-- Active products will be injected here -->
+    </div>
+    
+    ...
+    
+    <div class="product-list" id="archived-products">
+        <!-- Archived products will be injected here -->
+    </div>
+    <script src="js/product-list.js"></script>
+  </body>
+</html>

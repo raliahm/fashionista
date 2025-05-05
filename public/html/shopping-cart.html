@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+  <head>
+     <link rel="stylesheet" href="css/homepage.css">
+  </head>
+  <body>
+    <h1>FASHIONISTA NAILS</h1>
+    <nav class="navbar">
+        <ul class="nav-links">
+          <a href="homepage">Home</a>
+          <a href="products">Products</a>
+          <a href="details">Details</a>
+          <a href="shopping-cart">shopping cart</a>
+          <a href="admin">Admin portal</a>
+        </ul>
+    </nav>
+    
+      <div class="main-layout" id="cart">
+        <div class="cart-header-container">
+           <button id="cart-toggle" >Shopping Cart</button>
+        </div>
+        <!-- Cart container, hidden initially -->
+        <div id="cart-container" style="display: none;">
+          <div id="cart-count" ></div>
+           <!-- Cart items will be dynamically added here -->
+          <div id="cart-total"></div> <!-- Cart total will be inside the cart container -->
+          <div id="clear-cart" style="display: none;;"></div>
+        </div>
+        
+        <div class="cart-checkout-container">
+          <button class="order">Proceed to Checkout</button>
+          <div id="checkout">
+            
+         
+
+          </div>
+        </div>
+       
+        
+      </div>
+
+      
+    
+  </body>
+  <script src="js/cart.js">
+  </script>
+  <script>
+   
+  document.addEventListener("DOMContentLoaded", function () {
+      const storedCart = localStorage.getItem("cart");
+      if (storedCart) {
+        cart = JSON.parse(storedCart);
+      }
+      updateCartDisplay();
+
+      document.getElementById("cart-toggle").addEventListener('click', function () {
+    const cartContainer = document.getElementById("cart-container");
+    const headerContainer = document.querySelector(".cart-header-container");
+
+    if (cartContainer && headerContainer) {
+      const isVisible = cartContainer.style.display === "none" || cartContainer.style.display === "";
+      cartContainer.style.display = isVisible ? "block" : "none";
+      headerContainer.classList.toggle("cart-open");
+    }
+  });
+});
+
+
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll(".order").forEach(button => {
+    button.addEventListener('click', function () {
+      const order = localStorage.getItem("cart");
+      if(order == null) {
+        alert("Empty cart");
+      } else {
+        
+      
+      const cCon = document.querySelector(".cart-checkout-container");
+      if (!cCon) return;
+
+      cCon.innerHTML = `
+        <h2>Checkout</h2> 
+        
+        <form id="checkout-form">
+          <label for="name">Full Name:</label>
+          <input type="text" id="name" name="name" required><br><br>
+
+          <label for="address">Shipping Address:</label>
+          <input type="text" id="address" name="address" required><br><br>
+
+          <label for="card">Card Number:</label>
+          <input type="text" id="card" name="card" required><br><br>
+
+          <input type="hidden" name="order" value='${order}'>
+          <button type="submit">Submit Order</button>
+        </form>
+      `;
+      
+      document.getElementById("checkout-form").addEventListener("submit", function (event) {
+        event.preventDefault();
+        const formData = {
+          name: this.name.value,
+          address: this.address.value,
+          card: this.card.value,
+          order: order
+        };
+        console.log("Form submitted with:", formData);
+        // Clear cart
+        localStorage.removeItem("cart");
+
+        // Show success alert
+        alert("Order submitted! Thanks, " + formData.name + " 🎉");
+        
+
+        // Generate receipt content
+        const receiptContent = `
+                Order Confirmation
+
+                Customer Name: ${formData.name}
+                Shipping Address: ${formData.address}
+
+                Items Ordered:
+                ${order}
+
+                Payment Method: **** **** **** ${formData.card.slice(-4)}
+
+                Thank you for shopping with us!
+                `;
+                // Create downloadable file
+        const blob = new Blob([receiptContent], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "order_receipt.txt";
+        link.click();
+        URL.revokeObjectURL(url); // Clean up
+      });
+      }
+    });
+
+  });
+});
+
+  </script>
+</html>
