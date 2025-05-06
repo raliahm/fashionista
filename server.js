@@ -5,7 +5,11 @@ const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('./db/fashionista.db')
 const fs = require('fs');
+const axios = require('axios');
+const bodyParser = require('body-parser');
 
+const clientId = 'AZ6OCxO_JolQ2NyAnO2r9xt_k52BCOqd25veUKfkjE3HahNH9sMeO9YJTxqjr_xxA-rUNWdmqwWQahji';
+const clientSecret = 'EKvCvkx0l_L47DozU-QlwAUmuDQAV9sEBOWJpZkzK3gnrG-7nctSDnIozYqeQz7huoWwz-kh1d_mjC7w';
 // Create an instance of Express app
 const app = express();
 
@@ -276,12 +280,217 @@ function insertProducts(products) {
   });
 }
 
+async function getPaypalAccessToken() {
+  const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+  
+  const response = await axios.post('https://api.sandbox.paypal.com/v1/oauth2/token', 
+    'grant_type=client_credentials', 
+    {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': `Basic ${auth}`
+      }
+    });
+  
+  return response.data.access_token;
+}
+
+// Route to handle PayPal Checkout
+app.post('/api/checkout/paypal', async (req, res) => {
+  const { cartId, userId, totalPrice, totalQuantity, shippingAddress, email, phone } = req.body;
+
+  try {
+    // Get PayPal Access Token
+    const accessToken = await getPaypalAccessToken();
+
+    // Step 1: Create PayPal Order
+    const orderPayload = {
+      intent: 'CAPTURE',
+      purchase_units: [{
+        amount: {
+          currency_code: 'USD',
+          value: totalPrice,
+        },
+        description: `Total Quantity: ${totalQuantity} items`,
+        shipping: {
+          address: {
+            address_line_1: shippingAddress,
+            admin_area_2: 'City', // Change as needed
+            admin_area_1: 'State', // Change as needed
+            postal_code: 'PostalCode', // Change as needed
+            country_code: 'US', // Change as needed
+          },
+        },
+      }],
+      payer: {
+        email_address: email,
+        phone: {
+          phone_type: 'MOBILE', // or LANDLINE
+          phone_number: phone,
+        },
+      },
+    };
+
+    // Make the request to create the order
+    const response = await axios.post('https://api.sandbox.paypal.com/v2/checkout/orders', orderPayload, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const orderID = response.data.id;
+
+    // Send the PayPal order ID back to the frontend
+    res.json({ success: true, orderId: orderID });
+  } catch (error) {
+    console.error('Error processing PayPal payment:', error);
+    res.status(500).json({ success: false, message: 'Payment failed. Please try again.' });
+  }
+});
+// Route to handle PayPal Checkout
+app.post('/api/checkout/paypal', async (req, res) => {
+  const { cartId, userId, totalPrice, totalQuantity, shippingAddress, email, phone } = req.body;
+
+  try {
+    // Get PayPal Access Token
+    const accessToken = await getPaypalAccessToken();
+
+    // Step 1: Create PayPal Order
+    const orderPayload = {
+      intent: 'CAPTURE',
+      purchase_units: [{
+        amount: {
+          currency_code: 'USD',
+          value: totalPrice,
+        },
+        description: `Total Quantity: ${totalQuantity} items`,
+        shipping: {
+          address: {
+            address_line_1: shippingAddress,
+            admin_area_2: 'City', // Change as needed
+            admin_area_1: 'State', // Change as needed
+            postal_code: 'PostalCode', // Change as needed
+            country_code: 'US', // Change as needed
+          },
+        },
+      }],
+      payer: {
+        email_address: email,
+        phone: {
+          phone_type: 'MOBILE', // or LANDLINE
+          phone_number: phone,
+        },
+      },
+    };
+
+    // Make the request to create the order
+    const response = await axios.post('https://api.sandbox.paypal.com/v2/checkout/orders', orderPayload, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const orderID = response.data.id;
+
+    // Send the PayPal order ID back to the frontend
+    res.json({ success: true, orderId: orderID });
+  } catch (error) {
+    console.error('Error processing PayPal payment:', error);
+    res.status(500).json({ success: false, message: 'Payment failed. Please try again.' });
+  }
+});
+// Route to capture PayPal Order
+const { addCheckoutRecord } = require('./controller/productController'); 
+
+app.post('/api/checkout/capture', async (req, res) => {
+  const { orderId, cartId, userId, totalPrice, totalQuantity, shippingAddress, email, phone } = req.body;
+
+  try {
+    const accessToken = await getPaypalAccessToken();
+
+
+    // Fetch cart items
+    db.all(`SELECT * FROM CartItems WHERE CartID = ?`, [cartId], async (err, rows) => {
+      if (err) {
+        console.error('Error fetching cart items:', err);
+        return res.status(500).json({ success: false, message: 'Failed to fetch cart items' });
+      }
+
+      const items = rows;
+
+      // Insert checkout record using existing logic
+      addCheckoutRecord(
+        cartId,
+        userId,
+        totalPrice,
+        totalQuantity,
+        shippingAddress,
+        'paypal', // use 'paypal' as dummy card number
+        paymentDetails.id, // store PayPal order ID in CardCV field
+        items,
+        (err, result) => {
+          if (err) {
+            return res.status(500).json({ success: false, message: 'Failed to save PayPal order' });
+          }
+          return res.json({ success: true, message: 'PayPal order saved', orderId: result.orderId });
+        }
+      );
+    });
+
+  } catch (error) {
+    console.error('Error capturing PayPal payment:', error.response?.data || error.message);
+    res.status(500).json({ success: false, message: 'Failed to capture payment' });
+  }
+});
+
+
+function saveOrderToDatabase(paymentDetails) {
+  return new Promise((resolve, reject) => {
+    const payer = paymentDetails.payer;
+    const purchase = paymentDetails.purchase_units[0];
+    const shipping = purchase.shipping;
+    const amount = purchase.amount.value;
+    const cartStatus = 'purchased';
+
+    const shippingAddress = shipping?.address?.address_line_1 || 'N/A';
+    const email = payer.email_address || 'N/A';
+    const phone = payer.phone?.phone_number?.national_number || 'N/A';
+    const userId = 1; // Replace with actual user ID if available
+
+    // Insert order into your database
+    const sql = `
+      INSERT INTO Orders (UserID, TotalPrice, ShippingAddress, Email, Phone, CartStatus, PaymentMethod, PaymentID)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    const params = [
+      userId,
+      amount,
+      shippingAddress,
+      email,
+      phone,
+      cartStatus,
+      paymentDetails.id
+    ];
+
+    db.run(sql, params, function (err) {
+      if (err) return reject(err);
+      resolve(true);
+    });
+  });
+}
+
+
+
+
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/nail-photos', express.static(path.join(__dirname, 'public', 'nail-photos')));
 
 const productRoutes = require('./routes/product-route'); // Adjust path as needed
 app.use('/api', productRoutes);
 
+app.use(bodyParser.json());
 
 // Start the server
 app.listen(port, () => {

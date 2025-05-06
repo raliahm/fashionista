@@ -50,69 +50,69 @@ async function addToCart(product) {
   }
 }
 
-async function updateCartDisplay() {
-  const cartContainer = document.getElementById("cart-container");
-  if (!cartId || !cartContainer) return;
+  async function updateCartDisplay() {
+    const cartContainer = document.getElementById("cart-container");
+    if (!cartId || !cartContainer) return;
 
-  try {
-    // Get cart items
-    const res = await fetch(`http://localhost:3000/api/cart/details/${cartId}`);
-    const products = await res.json();
+    try {
+      // Get cart items
+      const res = await fetch(`http://localhost:3000/api/cart/details/${cartId}`);
+      const products = await res.json();
 
-    // Get total price and quantity
-    
-    const tP = await fetch(`http://localhost:3000/api/cart/total/${cartId}`);
-    console.log(tP);
-    const tQ = await fetch(`http://localhost:3000/api/cart/total-quantity/${cartId}`);
-    const totalQuantity = await tQ.json();
-    const totalPrice = await tP.json();
+      // Get total price and quantity
+      
+      const tP = await fetch(`http://localhost:3000/api/cart/total/${cartId}`);
+      console.log(tP);
+      const tQ = await fetch(`http://localhost:3000/api/cart/total-quantity/${cartId}`);
+      const totalQuantity = await tQ.json();
+      const totalPrice = await tP.json();
 
-    cartContainer.innerHTML = "";
+      cartContainer.innerHTML = "";
 
-    if (!products.length) {
-      cartContainer.innerHTML = "<h2>Your cart is empty.</h2>";
-      return;
-    }
-
-    // Optional: group products by ID if needed (skip if backend handles it)
-    const grouped = products.reduce((acc, p) => {
-      if (!acc[p.ProductID]) {
-        acc[p.ProductID] = { ...p };
-      } else {
-        acc[p.ProductID].Quantity += p.Quantity;
+      if (!products.length) {
+        cartContainer.innerHTML = "<h2>Your cart is empty.</h2>";
+        return;
       }
-      return acc;
-    }, {});
 
-    // Display cart items
-    Object.values(grouped).forEach(product => {
-      const item = document.createElement("div");
-      item.className = "cart-item";
-      item.innerHTML = `
-        <img src="${product.ProductImageURL}" alt="${product.ProductName}">
-        <h3>${product.ProductName}</h3>
-        <p>$${product.ProductPrice}</p>
-        <p>
-          <button onclick="updateQuantity(${product.ProductID}, ${product.Quantity - 1})">-</button>
-          ${product.Quantity}
-          <button onclick="updateQuantity(${product.ProductID}, ${product.Quantity + 1})">+</button>
-          <button onclick="removeFromCart(${product.ProductID})">Remove</button>
-        </p>
+      // Optional: group products by ID if needed (skip if backend handles it)
+      const grouped = products.reduce((acc, p) => {
+        if (!acc[p.ProductID]) {
+          acc[p.ProductID] = { ...p };
+        } else {
+          acc[p.ProductID].Quantity += p.Quantity;
+        }
+        return acc;
+      }, {});
+
+      // Display cart items
+      Object.values(grouped).forEach(product => {
+        const item = document.createElement("div");
+        item.className = "cart-item";
+        item.innerHTML = `
+          <img src="${product.ProductImageURL}" alt="${product.ProductName}">
+          <h3>${product.ProductName}</h3>
+          <p>$${product.ProductPrice}</p>
+          <p>
+            <button onclick="updateQuantity(${product.ProductID}, ${product.Quantity - 1})">-</button>
+            ${product.Quantity}
+            <button onclick="updateQuantity(${product.ProductID}, ${product.Quantity + 1})">+</button>
+            <button onclick="removeFromCart(${product.ProductID})">Remove</button>
+          </p>
+        `;
+        cartContainer.appendChild(item);
+      });
+
+      // Show totals
+      cartContainer.innerHTML += `
+        <div class="cart-total"><h3>Total: $${totalPrice} <br>(${totalQuantity} items)</h3></div>
+        <div class="cart-checkout"><button onclick="goToCheckout()">Checkout</button></div>
       `;
-      cartContainer.appendChild(item);
-    });
 
-    // Show totals
-    cartContainer.innerHTML += `
-      <div class="cart-total"><h3>Total: $${totalPrice} <br>(${totalQuantity} items)</h3></div>
-      <div class="cart-checkout"><button onclick="goToCheckout()">Checkout</button></div>
-    `;
-
-  } catch (error) {
-    console.error("Error updating cart display:", error);
-    cartContainer.innerHTML = "<h2>Failed to load cart.</h2>";
+    } catch (error) {
+      console.error("Error updating cart display:", error);
+      cartContainer.innerHTML = "<h2>Failed to load cart.</h2>";
+    }
   }
-}
 
 
 
@@ -157,7 +157,126 @@ async function clearCart(cartStatus) {
 
 function goToCheckout() {
   window.location.href = "/shopping-cart"; // Redirect to checkout page
+  paypalCheckout(); // Call PayPal checkout function
+  // or any other checkout function you have
 }
+
+
+//function to clear the cart on the front end
+// This function will be called when the cart is cleared on the backend
+// and will update the front-end cart display accordingly.  
+function clearingFrontEndCart() {
+  const cartContainer = document.getElementById("cart-container");
+  if (cartContainer) {
+    cartContainer.innerHTML = "<h2>Your cart is empty.</h2>";
+  }
+}
+
+   
+document.addEventListener("DOMContentLoaded", function () {
+    const storedCart = localStorage.getItem("cart");
+    if (storedCart) {
+      cart = JSON.parse(storedCart);
+    }
+    updateCartDisplay();
+
+    document.getElementById("cart-toggle").addEventListener('click', function () {
+  const cartContainer = document.getElementById("cart-container");
+  const headerContainer = document.querySelector(".cart-header-container");
+
+  if (cartContainer && headerContainer) {
+    const isVisible = cartContainer.style.display === "none" || cartContainer.style.display === "";
+    cartContainer.style.display = isVisible ? "block" : "none";
+    headerContainer.classList.toggle("cart-open");
+  }
+});
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll(".order").forEach(button => {
+    button.addEventListener('click', async function () {
+      const cCon = document.querySelector(".cart-checkout-container");
+      if (!cCon) return;
+
+      // Inject the form and PayPal container
+      cCon.innerHTML = `
+        <h2>Checkout</h2> 
+        <form id="checkout-form">
+            <label for="name">Full Name:</label>
+            <input type="text" id="name" name="name" required><br><br>
+
+            <label for="address">Shipping Address:</label>
+            <input type="text" id="address" name="address" required><br><br>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required><br><br>
+
+            <label for="phone">Phone Number:</label>
+            <input type="text" id="phone" name="phone" required><br><br>
+
+            <label for="card">Card Number:</label>
+            <input type="text" id="card" name="card" required><br><br>
+
+            <label for="cvv">CVV:</label>
+            <input type="text" id="cvv" name="cvv" required><br><br>
+
+            <button type="submit">Submit Order</button>
+        </form>
+
+        <div style="margin-top: 20px;">
+          <h3>— OR —</h3>
+          <div id="paypal-button-container"></div>
+        </div>
+      `;
+
+     paypalCheckout(); // Call PayPal checkout function
+
+      // Handle card checkout submit
+      const form = document.getElementById("checkout-form");
+      form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const formData = {
+          name: this.name.value,
+          address: this.address.value,
+          email: this.email.value,
+          phone: this.phone.value,
+          card: this.card.value,
+          cvv: this.cvv.value
+        };
+
+        const result = await checkout(formData);
+        if (!result.success) return;
+
+        alert("Order submitted! Thanks, " + formData.name + " 🎉");
+        clearingFrontEndCart();
+
+        const receiptContent = `
+Order Confirmation
+
+Customer Name: ${formData.name}
+Shipping Address: ${formData.address}
+
+Items Ordered: 
+${JSON.stringify(result.items)}
+
+Payment Method: **** **** **** ${formData.card.slice(-4)}
+
+Thank you for shopping with us!
+        `;
+        const blob = new Blob([receiptContent], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "order_receipt.txt";
+        link.click();
+        URL.revokeObjectURL(url);
+      });
+    });
+  });
+});
+
+
 
 
 async function checkout(formData) {
@@ -171,7 +290,7 @@ async function checkout(formData) {
   const tQ = await fetch(`http://localhost:3000/api/cart/total-quantity/${cartId}`);
   const totalQuantity = await tQ.json();
   const totalPrice = await tP.json();
-  
+
   if (!formData.name || !formData.address || !formData.card || !formData.cvv) {
     alert("Please fill in all fields.");
     return { success: false };
@@ -189,6 +308,8 @@ async function checkout(formData) {
     return { success: false };
 
   }
+
+
 
   const userId = localStorage.getItem("userId") || 1;
   if (!cartId) {
@@ -230,104 +351,79 @@ async function checkout(formData) {
 
   }
 }
+ 
 
-//function to clear the cart on the front end
-// This function will be called when the cart is cleared on the backend
-// and will update the front-end cart display accordingly.  
-function clearingFrontEndCart() {
-  const cartContainer = document.getElementById("cart-container");
-  if (cartContainer) {
-    cartContainer.innerHTML = "<h2>Your cart is empty.</h2>";
-  }
+async function paypalCheckout() {
+  const tP = await fetch(`http://localhost:3000/api/cart/total/${cartId}`);
+  const tQ = await fetch(`http://localhost:3000/api/cart/total-quantity/${cartId}`);
+  const totalQuantity = await tQ.json();
+  const totalPrice = await tP.json();
+
+  const userId = localStorage.getItem("userId") || 1;
+
+  // Avoid rendering PayPal button more than once
+  const container = document.getElementById("paypal-button-container");
+  if (!container || container.children.length > 0) return;
+
+  paypal.Buttons({
+    createOrder: async (data, actions) => {
+      return actions.order.create({
+        purchase_units: [{
+          amount: { value: totalPrice },
+          description: "Your cart items"
+        }]
+      });
+    },
+
+    onApprove: async (data, actions) => {
+      const details = await actions.order.capture();
+
+      const payload = {
+        cartId,
+        userId,
+        totalPrice,
+        totalQuantity,
+        shippingAddress: "N/A",
+        email: "guest@example.com",
+        phone: "0000000000",
+        paymentDetails: details
+      };
+
+      try {
+        const response = await fetch(`http://localhost:3000/api/checkout/paypal`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const captureResponse = await fetch(`http://localhost:3000/api/checkout/capture`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            orderId: details.id,
+            cartId,
+            userId,
+            totalPrice,
+            totalQuantity,
+            shippingAddress: "N/A",
+            email: "guest@example.com",
+            phone: "0000000000"
+          })
+        });
+
+        const data = await captureResponse.json();
+
+        if (data.success) {
+          alert("PayPal payment successful and order saved!");
+          clearingFrontEndCart();
+        } else {
+          alert("Payment succeeded but saving order failed.");
+        }
+      } catch (error) {
+        console.error("Error processing PayPal payment:", error);
+        alert("Payment failed. Please try again.");
+      }
+    }
+  }).render('#paypal-button-container');
 }
 
-   
-document.addEventListener("DOMContentLoaded", function () {
-    const storedCart = localStorage.getItem("cart");
-    if (storedCart) {
-      cart = JSON.parse(storedCart);
-    }
-    updateCartDisplay();
-
-    document.getElementById("cart-toggle").addEventListener('click', function () {
-  const cartContainer = document.getElementById("cart-container");
-  const headerContainer = document.querySelector(".cart-header-container");
-
-  if (cartContainer && headerContainer) {
-    const isVisible = cartContainer.style.display === "none" || cartContainer.style.display === "";
-    cartContainer.style.display = isVisible ? "block" : "none";
-    headerContainer.classList.toggle("cart-open");
-  }
-});
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-  document.querySelectorAll(".order").forEach(button => {
-    button.addEventListener('click', async function () {
-      const cCon = document.querySelector(".cart-checkout-container");
-      if (!cCon) return;
-
-      cCon.innerHTML = `
-        <h2>Checkout</h2> 
-        <form id="checkout-form">
-            <label for="name">Full Name:</label>
-            <input type="text" id="name" name="name" required><br><br>
-
-            <label for="address">Shipping Address:</label>
-            <input type="text" id="address" name="address" required><br><br>
-
-            <label for="card">Card Number:</label>
-            <input type="text" id="card" name="card" required><br><br>
-
-            <label for="cvv">CVV:</label>
-            <input type="text" id="cvv" name="cvv" required><br><br>
-
-            <button type="submit">Submit Order</button>
-        </form>
-      `;
-
-      const form = document.getElementById("checkout-form");
-      form.addEventListener("submit", async function (event) {
-        event.preventDefault();
-
-        const formData = {
-          name: this.name.value,
-          address: this.address.value,
-          card: this.card.value,
-          cvv: this.cvv.value
-        };
-
-        const result = await checkout(formData); // Wait for checkout
-        const { items } = result;
-        const receiptItems = items; // Format items for receipt
-        if (!result.success) return; // Stop if checkout failed
-
-        alert("Order submitted! Thanks, " + formData.name + " 🎉");
-        clearingFrontEndCart();
-        
-        // Generate downloadable receipt
-        const receiptContent = `
-Order Confirmation
-
-Customer Name: ${formData.name}
-Shipping Address: ${formData.address}
-
-Items Ordered: 
-${receiptItems}
-
-Payment Method: **** **** **** ${formData.card.slice(-4)}
-
-Thank you for shopping with us!
-        `;
-
-        const blob = new Blob([receiptContent], { type: "text/plain" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = "order_receipt.txt";
-        link.click();
-        URL.revokeObjectURL(url);
-      });
-    });
-  });
-});
