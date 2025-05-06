@@ -1,6 +1,4 @@
 let cartId = localStorage.getItem("cartId");
-
-// Create cart if it doesn't exist
 async function initializeCart() {
   if (!cartId) {
     const res = await fetch('http://localhost:3000/api/cart', { method: 'POST',
@@ -62,11 +60,12 @@ async function updateCartDisplay() {
     const products = await res.json();
 
     // Get total price and quantity
-    const totalRes = await fetch(`http://localhost:3000/api/cart/details-total/${cartId}`);
-    const totals = await totalRes.json();
-
-    const totalPrice = totals.totalPrice || 0;
-    const totalQuantity = totals.totalQuantity || 0;
+    
+    const tP = await fetch(`http://localhost:3000/api/cart/total/${cartId}`);
+    console.log(tP);
+    const tQ = await fetch(`http://localhost:3000/api/cart/total-quantity/${cartId}`);
+    const totalQuantity = await tQ.json();
+    const totalPrice = await tP.json();
 
     cartContainer.innerHTML = "";
 
@@ -92,7 +91,7 @@ async function updateCartDisplay() {
       item.innerHTML = `
         <img src="${product.ProductImageURL}" alt="${product.ProductName}">
         <h3>${product.ProductName}</h3>
-        <p>$${product.ProductPrice.toFixed(2)}</p>
+        <p>$${product.ProductPrice}</p>
         <p>
           <button onclick="updateQuantity(${product.ProductID}, ${product.Quantity - 1})">-</button>
           ${product.Quantity}
@@ -105,8 +104,8 @@ async function updateCartDisplay() {
 
     // Show totals
     cartContainer.innerHTML += `
-      <div class="cart-total"><h3>Total: $${totalPrice.toFixed(2)} (${totalQuantity} items)</h3></div>
-      <div class="cart-checkout"><button onclick="checkout()">Checkout</button></div>
+      <div class="cart-total"><h3>Total: $${totalPrice} <br>(${totalQuantity} items)</h3></div>
+      <div class="cart-checkout"><button onclick="goToCheckout()">Checkout</button></div>
     `;
 
   } catch (error) {
@@ -153,21 +152,94 @@ async function clearCart(cartStatus) {
   });
   localStorage.removeItem("cartId");
   cartId = null;
-  updateCartDisplay();
+  initializeCart();
+}
+
+function goToCheckout() {
+  window.location.href = "/shopping-cart"; // Redirect to checkout page
 }
 
 
-async function checkout() {
-  await fetch(`http://localhost:3000/api/checkout/cartId`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ cartId })
-  });
+async function checkout(formData) {
 
-  alert('Checkout complete!');
-  clearCart('purchased'); // Optionally clear cart
+  if (!cartId) {
+    alert("Cart ID not found");
+    return false;
+  }
+  const tP = await fetch(`http://localhost:3000/api/cart/total/${cartId}`);
+  console.log(tP);
+  const tQ = await fetch(`http://localhost:3000/api/cart/total-quantity/${cartId}`);
+  const totalQuantity = await tQ.json();
+  const totalPrice = await tP.json();
+  
+  if (!formData.name || !formData.address || !formData.card || !formData.cvv) {
+    alert("Please fill in all fields.");
+    return { success: false };
+  }
+  if (formData.card.length < 16) {
+    alert("Card number must be 16 digits long.");
+    return { success: false };
+  }
+  if (formData.cvv.length < 3) {
+    alert("CVV must be 3 digits long.");
+    return { success: false };
+  }
+  if (formData.address.length < 5) {
+    alert("Address must be at least 5 characters long.");
+    return { success: false };
+
+  }
+
+  const userId = localStorage.getItem("userId") || 1;
+  if (!cartId) {
+    alert("Cart ID not found");
+    return { success: false };
+  }
+  const items = await fetch(`http://localhost:3000/api/cart/${cartId}`);
+  if (!items.ok) {
+    alert("Failed to fetch cart items.");
+    return { success: false };
+  }
+  console.log(items);
+  const itemsData = await items.json();
+  console.log(itemsData);
+  const payload = {
+    cartId,
+    userId,
+    totalPrice,
+    totalQuantity,
+    shippingAddress: formData.address,
+    cardNumber: formData.card,
+    cardCV: formData.cvv,
+    cartStatus: 'purchased',
+    items: itemsData
+  };
+
+  try {
+    await fetch(`http://localhost:3000/api/checkout/cartId`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    clearCart('purchased'); // Clear the cart after successful checkout
+    return { success: true, items: itemsData };
+  } catch (error) {
+    console.error("Checkout failed:", error);
+    alert("Checkout failed. Please try again.");
+    return { success: false };
+
+  }
 }
 
+//function to clear the cart on the front end
+// This function will be called when the cart is cleared on the backend
+// and will update the front-end cart display accordingly.  
+function clearingFrontEndCart() {
+  const cartContainer = document.getElementById("cart-container");
+  if (cartContainer) {
+    cartContainer.innerHTML = "<h2>Your cart is empty.</h2>";
+  }
+}
 
    
 document.addEventListener("DOMContentLoaded", function () {
@@ -189,79 +261,73 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 });
 
-
 document.addEventListener('DOMContentLoaded', function () {
-document.querySelectorAll(".order").forEach(button => {
-  button.addEventListener('click', function () {
-    const order = localStorage.getItem("cart");
-    if(order == null) {
-      alert("Empty cart");
-    } else {
-      
-    
-    const cCon = document.querySelector(".cart-checkout-container");
-    if (!cCon) return;
+  document.querySelectorAll(".order").forEach(button => {
+    button.addEventListener('click', async function () {
+      const cCon = document.querySelector(".cart-checkout-container");
+      if (!cCon) return;
 
-    cCon.innerHTML = `
-      <h2>Checkout</h2> 
-      
-      <form id="checkout-form">
-        <label for="name">Full Name:</label>
-        <input type="text" id="name" name="name" required><br><br>
+      cCon.innerHTML = `
+        <h2>Checkout</h2> 
+        <form id="checkout-form">
+            <label for="name">Full Name:</label>
+            <input type="text" id="name" name="name" required><br><br>
 
-        <label for="address">Shipping Address:</label>
-        <input type="text" id="address" name="address" required><br><br>
+            <label for="address">Shipping Address:</label>
+            <input type="text" id="address" name="address" required><br><br>
 
-        <label for="card">Card Number:</label>
-        <input type="text" id="card" name="card" required><br><br>
+            <label for="card">Card Number:</label>
+            <input type="text" id="card" name="card" required><br><br>
 
-        <input type="hidden" name="order" value='${order}'>
-        <button type="submit">Submit Order</button>
-      </form>
-    `;
-    
-    document.getElementById("checkout-form").addEventListener("submit", function (event) {
-      event.preventDefault();
-      const formData = {
-        name: this.name.value,
-        address: this.address.value,
-        card: this.card.value,
-        order: order
-      };
-      console.log("Form submitted with:", formData);
-      // Clear cart
-       clearCart('purchased'); // Clear cart after order submission
-      localStorage.removeItem("cart");
+            <label for="cvv">CVV:</label>
+            <input type="text" id="cvv" name="cvv" required><br><br>
 
-      // Show success alert
-      alert("Order submitted! Thanks, " + formData.name + " 🎉");
-      
+            <button type="submit">Submit Order</button>
+        </form>
+      `;
 
-      // Generate receipt content
-      const receiptContent = `
-              Order Confirmation
+      const form = document.getElementById("checkout-form");
+      form.addEventListener("submit", async function (event) {
+        event.preventDefault();
 
-              Customer Name: ${formData.name}
-              Shipping Address: ${formData.address}
+        const formData = {
+          name: this.name.value,
+          address: this.address.value,
+          card: this.card.value,
+          cvv: this.cvv.value
+        };
 
-              Items Ordered:
-              ${order}
+        const result = await checkout(formData); // Wait for checkout
+        const { items } = result;
+        const receiptItems = items; // Format items for receipt
+        if (!result.success) return; // Stop if checkout failed
 
-              Payment Method: **** **** **** ${formData.card.slice(-4)}
+        alert("Order submitted! Thanks, " + formData.name + " 🎉");
+        clearingFrontEndCart();
+        
+        // Generate downloadable receipt
+        const receiptContent = `
+Order Confirmation
 
-              Thank you for shopping with us!
-              `;
-              // Create downloadable file
-      const blob = new Blob([receiptContent], { type: "text/plain" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "order_receipt.txt";
-      link.click();
-      URL.revokeObjectURL(url); // Clean up
+Customer Name: ${formData.name}
+Shipping Address: ${formData.address}
+
+Items Ordered: 
+${receiptItems}
+
+Payment Method: **** **** **** ${formData.card.slice(-4)}
+
+Thank you for shopping with us!
+        `;
+
+        const blob = new Blob([receiptContent], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "order_receipt.txt";
+        link.click();
+        URL.revokeObjectURL(url);
+      });
     });
-    }
   });
-
-});
 });

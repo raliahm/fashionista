@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <link rel="stylesheet" href="css/admin.css">
-  <title>Admin - Product Listing</title>
+  <meta charset="UTF-8" />
+  <title>Order Management</title>
+  <link rel="stylesheet" href="css/admin.css" />
+  <script src="js/orders.js"></script>
 </head>
 <body>
   <nav class="navbar">
@@ -22,24 +23,12 @@
 
   <div class="admin-container">
     <section class="header">
-      <h1>Product List</h1> 
+      <h1>Manage Orders</h1>
     </section>
 
-    <section class="instructions">
-      <label for="search">Search Product:</label>
-      <input type="text" id="search" placeholder="Enter product name">
-
-      <label for="category-filter">Filter by Category:</label>
-      <select id="category-filter"></select>
-
-      <button onclick="filterProducts()">Filter</button>
-    </section> 
-
-    <div class="product-list" id="active-products">
-      <!-- Products will be injected here -->
-    </div>
+    <section class="order-list" id="order-container">
+      <!-- Orders will be injected here -->
+    </section>
   </div>
-
-  <script src="js/product-list.js"></script>
 </body>
 </html>

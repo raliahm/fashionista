@@ -29,4 +29,10 @@ router.put('/cart/update/:cartId/:productId', controller.updateProductQuantityIn
 
 router.post('/checkout/cartId', controller.addCheckoutRecord);
 
+router.get('/orders/all', controller.getAllOrders);
+router.get('/orders/:orderId', controller.getOrderById);
+router.get('/orders/user/:userId', controller.getOrdersByUserId);
+router.put('/orders/update/:orderId', controller.updateOrderStatus);
+router.delete('/orders/delete/:orderId', controller.deleteOrder);
+
 module.exports = router;

@@ -49,11 +49,14 @@ CREATE TABLE Orders (
   OrderID INTEGER PRIMARY KEY AUTOINCREMENT,
   CartID INTEGER NOT NULL,
   UserID INTEGER,
+  TotalPrice REAL NOT NULL,
+  TotalQuantity INTEGER NOT NULL,
   ShippingAddress TEXT NOT NULL,
   CardNumber TEXT NOT NULL,
   CardCV INTEGER NOT NULL,
   OrderDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   OrderStatus TEXT CHECK(OrderStatus IN ('delivered', 'processing', 'shipped', 'cancelled')) DEFAULT 'processing',	
+  OrderItems TEXT NOT NULL,
   FOREIGN KEY (CartID) REFERENCES Carts(CartID),
   FOREIGN KEY (UserID) REFERENCES Users(UserID)
 );

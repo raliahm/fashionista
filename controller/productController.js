@@ -117,8 +117,9 @@ exports.updateProductQuantityInCart = (req, res) => {
 };
 
 exports.addCheckoutRecord = (req, res) => {
-    const { cartId, userId, totalPrice } = req.body;
-    productModel.addCheckoutRecord(cartId, userId, totalPrice, (err, result) => {
+    const { cartId, userId, totalPrice, totalQuantity, shippingAddress, cardNumber, cardCV, items  } = req.body;
+    console.log(items);
+    productModel.addCheckoutRecord(cartId, userId, totalPrice, totalQuantity, shippingAddress, cardNumber, cardCV, items, (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
         res.status(201).json(result);
     });
@@ -207,5 +208,42 @@ exports.getCartTotalQuantity = (req, res) => {
     productModel.getCartTotalQuantity(cartId, (err, totalQuantity) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json(totalQuantity);
+    });
+};
+
+exports.getOrderById = (req, res) => {
+    const orderId = req.params.orderId;
+    productModel.getOrderById(orderId, (err, order) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(order);
+    });
+};
+exports.getAllOrders = (req, res) => {
+    productModel.getAllOrders((err, orders) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(orders);
+    });
+};
+exports.getOrdersByUserId = (req, res) => {
+    const userId = req.params.userId;
+    productModel.getOrdersByUserId(userId, (err, orders) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(orders);
+    });
+};
+
+exports.updateOrderStatus = (req, res) => {
+    const orderId = req.params.orderId;
+    const { status } = req.body;
+    productModel.updateOrderStatus(orderId, status, (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(result);
+    });
+}
+exports.deleteOrder = (req, res) => {
+    const orderId = req.params.orderId;
+    productModel.deleteOrder(orderId, (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(result);
     });
 };

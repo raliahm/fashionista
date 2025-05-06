@@ -100,7 +100,7 @@ module.exports = {
                 cb(err, null);
             } else {
                         cb(null, { id: this.lastID, cartId: this.cartId, productId: this.productId, quantity: this.quantity 
-                            
+
                         });
             }    
         });
@@ -129,9 +129,7 @@ module.exports = {
             }
         });
     },
-    clearCart: (cartId, cb) => {
-        const CartStatus = 'abandoned';
-    
+    clearCart: (cartId, CartStatus, cb) => {
         console.log('Clearing cart with ID:', cartId);
         const deleteSql = 'DELETE FROM CartProducts WHERE CartID = ?';
         const updateSql = 'UPDATE Carts SET CartStatus = ? WHERE CartID = ?';
@@ -201,16 +199,19 @@ module.exports = {
         });
     },
     //add checkout record
-    addCheckoutRecord: (cartId, userId, totalPrice, shippingAddress, cardNumber, cardCV, cb) => {
+    addCheckoutRecord: (cartId, userId, totalPrice, totalQuantity, shippingAddress, cardNumber, cardCV, items, cb) => {
+       
         const insertSql = `
-            INSERT INTO Orders (CartID, UserID, ShippingAddress, CardNumber, CardCV, TotalPrice, OrderStatus)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO Orders (CartID, UserID, ShippingAddress, CardNumber, CardCV, TotalQuantity, TotalPrice, OrderStatus, OrderItems)
+            VALUES (?, ?, ?, ?,?, ?, ?, ?,?)
         `;
         const updateSql = 'UPDATE Carts SET CartStatus = ? WHERE CartID = ?';
-    
+        
+        const itemsString = JSON.stringify(items); // Convert items to a string
+        console.log('Items:', itemsString); // Log the items string for debugging
         db.run(
             insertSql,
-            [cartId, userId, shippingAddress, cardNumber, cardCV, totalPrice, 'placed'],
+            [cartId, userId, shippingAddress, cardNumber, cardCV, totalQuantity, totalPrice,  'processing', itemsString],
             function (err) {
                 if (err) {
                     console.error(err.message);
@@ -289,4 +290,64 @@ module.exports = {
             }
         });
     },
+    //get order by id
+    getOrderById: (orderId, cb) => {
+        const sql = 'SELECT * FROM Orders WHERE OrderID = ?';
+        db.get(sql, [orderId], (err, row) => {
+            if (err) {
+                console.error(err.message);
+                cb(err, null);
+            } else {
+                cb(null, row);
+            }
+        });
+    },
+    //get all orders
+    getAllOrders: (cb) => {
+        const sql = 'SELECT * FROM Orders';
+        db.all(sql, [], (err, rows) => {
+            if (err) {
+                console.error(err.message);
+                cb(err, null);
+            } else {
+                cb(null, rows);
+            }
+        });
+    },
+    //get orders by user id
+    getOrdersByUserId: (userId, cb) => {
+        const sql = 'SELECT * FROM Orders WHERE UserID = ?';
+        db.all(sql, [userId], (err, rows) => {
+            if (err) {
+                console.error(err.message);
+                cb(err, null);
+            } else {
+                cb(null, rows);
+            }
+        });
+    },
+    //update order status
+    updateOrderStatus: (orderId, status, cb) => {
+        const sql = 'UPDATE Orders SET OrderStatus = ? WHERE OrderID = ?';
+        db.run(sql, [status, orderId], function (err) {
+            if (err) {
+                console.error(err.message);
+                cb(err, null);
+            } else {
+                cb(null, { id: orderId });
+            }
+        });
+    },
+    //delete order
+    deleteOrder: (orderId, cb) => {
+        const sql = 'DELETE FROM Orders WHERE OrderID = ?';
+        db.run(sql, [orderId], function (err) {
+            if (err) {
+                console.error(err.message);
+                cb(err, null);
+            } else {
+                cb(null, { id: orderId });
+            }
+        });
+    }
 }

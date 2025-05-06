@@ -113,36 +113,62 @@
   font-size: 18px;
   color: #555;
 }
+.form-body {
+  max-width: 100%;
+  margin: 40px 60px;
+  background-color: #ffffff;
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', sans-serif;
+}
 
-.form-body { 
-  margin-bottom: 20px;
-  background-color: white;
-  padding: 20px;
+.form-body h1 {
+  text-align: center;
+  margin-bottom: 24px;
+  font-size: 28px;
+  color: #333;
+}
+
+.form-body form label {
+  display: block;
+  margin-bottom: 16px;
+  font-weight: 600;
+  color: #444;
+}
+
+.form-body form input[type="text"],
+.form-body form input[type="number"],
+.form-body form textarea {
+  width: 100%;
+  padding: 10px 14px;
+  margin-top: 6px;
+  border: 1px solid #ccc;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  font-size: 15px;
+  transition: border-color 0.2s;
+}
+
+.form-body form input:focus,
+.form-body form textarea:focus {
+  border-color: #5c67f2;
+  outline: none;
+}
+
+.form-body textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.form-body button[type="submit"] {
+  margin-top: 20px;
   width: 100%;
 }
-.form-body textarea {
-  font-size: 16px;
-  margin-left: 10%;
-  margin-bottom: 8px;
-  display: block;
-}
-.form-body label {
-  font-size: 16px;
-  margin-left: 10%;
-  margin-bottom: 8px;
-  display: block;
-}
 
-.form-body input[type="file"] {
-  margin-left: 10%;
-  font-size: 16px;
-  margin-bottom: 20px;
-}
-
-.form-body button {
-  margin-left: 10%;
+.form-body a.button.secondary {
+  margin-top: 10px;
+  display: inline-block;
+  text-align: center;
 }
 
 .instructions p{
@@ -190,6 +216,56 @@
     justify-content: center;
 }
 
+
+/* General button styling */
+.button,
+button,
+input[type="submit"] {
+  background-color: #5c67f2;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.button:hover,
+button:hover,
+input[type="submit"]:hover {
+  background-color: #434dc8;
+}
+
+/* Secondary button (e.g., cancel/back) */
+.button.secondary {
+  background-color: #ccc;
+  color: #333;
+}
+
+.button.secondary:hover {
+  background-color: #aaa;
+}
+
+/* Edit link inside product card */
+.product-card a {
+  display: inline-block;
+  margin-top: 10px;
+  background-color: #00b894;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.product-card a:hover {
+  background-color: #009f7a;
+}
+
 /* Product Card */
 .product-card {
     display: flex;
@@ -197,6 +273,7 @@
     border: 2px solid #ffdd94;
     border-radius: 10px;
     overflow: hidden;
+    text-align: left;
     width: 45%;
     padding: 15px;
     align-items: center;
@@ -312,6 +389,46 @@ button:hover {
   justify-content: space-between;
   margin-bottom: 0.5rem;
 }
+
+.order-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 20px;
+  margin: 20px 0;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.order-card h3 {
+  margin: 0 0 10px;
+}
+
+.order-card p {
+  margin: 6px 0;
+}
+
+.order-card select {
+  padding: 6px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.order-card button {
+  margin-top: 10px;
+  margin-right: 10px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background-color: #5c67f2;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.order-card button:hover {
+  background-color: #4a55d1;
+}
+
 
 /* Responsive Design */
 @media (max-width: 768px) {

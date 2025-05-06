@@ -56,6 +56,10 @@ app.get('/product-upload', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'html', 'product-upload.html'));
 });
 
+app.get('/orders', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'html', 'orders.html'));
+});
+
 // Example file upload endpoint using Multer
 app.post('/upload', upload.single('file'), (req, res) => {
   console.log('File uploaded:', req.file);
