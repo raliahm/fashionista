@@ -3,6 +3,7 @@
   <head>
   <meta charset="utf-8">
   <link rel="stylesheet" href="css/admin.css">
+  <script src="js/admin.js"></script>
   <title>Admin</title>
 </head>
   <body>
@@ -16,21 +17,17 @@
             <li><a href="product-listing">Listing</a></li>
             <li><a href="product-edit">Edit</a></li>
             <li><a href="orders">Orders</a></li>
+            <li><a href="product-add">Add</a></li>
             <li><a href="admin">Login</a></li>
-            <li><a href="logout">Logout</a></li>
-        </ul>
+          </ul>
     </nav>
 
-    <div class="admin-container-login">
-        <div class="logout-box">
-        <h2>Admin Login</h2>
-        <form action="admin-dashboard.html" method="POST">
-           <p>Username: <input type="text" name="username" placeholder="Username" required></p> 
-           <p>Password: <input type="password" name="password" placeholder="Password" required></p>
-           <br>
-           <button type="submit">Login</button>
-        </form>
-    </div>
+    <div class="admin-container">
+      <section class="header">
+          <h1>Admin Center</h1>
+          <p>Manage your products and orders efficiently.</p>
+      </section>
+
 
     </div>
   </body>
