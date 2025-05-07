@@ -120,7 +120,7 @@ loadCategories(); // Call the function to load categories
           allProducts = await res.json();
         }
     
-        // Then apply price filter client-side (API-based filter is optional)
+        // Then apply price filter client-side 
         const filtered = allProducts.filter(product =>
           product.ProductPrice >= minPrice && product.ProductPrice <= maxPrice
         );

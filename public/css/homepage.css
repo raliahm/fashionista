@@ -321,7 +321,7 @@ h1 {
     }
     #cart-container.cart-open {
       display: block;  /* Makes the cart visible */
-      /* Optionally add animations for a sliding effect */
+      /* add animations for a sliding effect */
       transition: transform 0.3s ease-in-out;
       transform: translateX(0);
   }

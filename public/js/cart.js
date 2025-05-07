@@ -2,7 +2,7 @@ let cartId = localStorage.getItem("cartId");
 async function initializeCart() {
   if (!cartId) {
     const res = await fetch('http://localhost:3000/api/cart', { method: 'POST',
-      body: JSON.stringify({ UserID: 1 }), // Assuming a user ID of 1 for demo purposes
+      body: JSON.stringify({ UserID: 1 }), //  a user ID of 1 for demo purposes
       headers: { 'Content-Type': 'application/json' }
      });
     const data = await res.json();
@@ -74,7 +74,7 @@ async function updateCartDisplay() {
       return;
     }
 
-    // Optional: group products by ID if needed (skip if backend handles it)
+    // group products by ID if needed
     const grouped = products.reduce((acc, p) => {
       if (!acc[p.ProductID]) {
         acc[p.ProductID] = { ...p };

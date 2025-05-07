@@ -1,4 +1,4 @@
-const productModel = require('../models/productModel'); // Adjust path if needed
+const productModel = require('../models/productModel'); 
 
 exports.getCategories = (req, res) => {
     productModel.getCategories((err, categories) => {
@@ -134,7 +134,7 @@ exports.searchProductsByKeyword = (req, res) => {
 };
 
 exports.createCart = (req, res) => {
-    const { UserID } = req.body; // assuming userId is passed in the request body
+    const { UserID } = req.body; // userId is passed in the request body
 
     productModel.createCart(UserID, (err, cart) => {
         if (err) return res.status(500).json({ error: err.message });

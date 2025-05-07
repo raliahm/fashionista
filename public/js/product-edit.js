@@ -38,7 +38,7 @@
 
     try {
       const res = await fetch(`http://localhost:3000/api/product/update/${product.ProductID}`, {
-        method: "PUT", // Use "POST" if your API expects that
+        method: "PUT", 
         headers: {
           "Content-Type": "application/json",
         },
