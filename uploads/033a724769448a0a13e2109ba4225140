@@ -1,0 +1,23 @@
+[
+    {
+        "ProductName": "Gel Polish Kit",
+        "ProductDescription": "A complete set of high-quality gel nail polishes with UV lamp.",
+        "ProductImageURL": "https://example.com/gel-polish-kit.jpg",
+        "ProductPrice": "29.99",
+        "CategoryName": "Gel"
+    },
+    {
+        "ProductName": "Acrylic Nail Extension Kit",
+        "ProductDescription": "Everything you need to create beautiful acrylic nails at home.",
+        "ProductImageURL": "https://example.com/acrylic-nail-extension-kit.jpg",
+        "ProductPrice": "34.99",
+        "CategoryName": "Nail Extension"
+    },
+    {
+        "ProductName": "Nail Art Kit",
+        "ProductDescription": "An amazing kit with brushes, gems, and decals for intricate nail art.",
+        "ProductImageURL": "https://example.com/nail-art-kit.jpg",
+        "ProductPrice": "19.99",
+        "CategoryName": "Nail Kit"
+    }
+]

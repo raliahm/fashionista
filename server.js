@@ -230,7 +230,6 @@ function parseCSVOrTxt(filePath) {
 }
 function insertProducts(products) {
   return new Promise((resolve, reject) => {
-    
     const insertCategorySql = `INSERT INTO Categories (CategoryName) VALUES (?)`;
     const findCategorySql = `SELECT CategoryID FROM Categories WHERE CategoryName = ?`;
     const insertProductSql = `
@@ -238,26 +237,31 @@ function insertProducts(products) {
       VALUES (?, ?, ?, ?, ?)`;
 
     let pending = products.length;
-
     if (!pending) return resolve();
 
     products.forEach((p) => {
       const category = p.category?.trim() || "Uncategorized";
       if (!p.name || !p.price) {
         console.warn("Skipping invalid product row:", p);
-        pending--;
-        if (pending === 0) resolve();
+        if (--pending === 0) resolve();
         return;
       }
+
       db.get(findCategorySql, [category], (err, row) => {
-        if (err) return reject(err);
+        if (err) {
+          console.error("Error finding category:", err);
+          return reject(err);
+        }
 
         const insertProduct = (categoryId) => {
           db.run(
             insertProductSql,
-            [p.name, p.description, categoryId, p.price, p.image],
+            [p.name, p.description || '', categoryId, p.price, p.image || ''],
             (err) => {
-              if (err) return reject(err);
+              if (err) {
+                console.error("Error inserting product:", p, err);
+                return reject(err);
+              }
               if (--pending === 0) resolve();
             }
           );
@@ -267,7 +271,10 @@ function insertProducts(products) {
           insertProduct(row.CategoryID);
         } else {
           db.run(insertCategorySql, [category], function (err) {
-            if (err) return reject(err);
+            if (err) {
+              console.error("Error inserting category:", category, err);
+              return reject(err);
+            }
             insertProduct(this.lastID);
           });
         }
@@ -275,6 +282,7 @@ function insertProducts(products) {
     });
   });
 }
+
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/nail-photos', express.static(path.join(__dirname, 'public', 'nail-photos')));

@@ -313,7 +313,7 @@ Customer Name: ${formData.name}
 Shipping Address: ${formData.address}
 
 Items Ordered: 
-${receiptItems}
+${JSON.stringify(receiptItems)}
 
 Payment Method: **** **** **** ${formData.card.slice(-4)}
 

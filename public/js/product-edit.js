@@ -53,3 +53,21 @@
       alert("Failed to update product.");
     }
   });
+
+  document.getElementById('delete-button').addEventListener('click', function () {
+    const productId = document.getElementById('product-id').value;
+    if (confirm(`Are you sure you want to delete product ID ${productId}?`)) {
+      fetch(`/api/product/delete/${productId}`, {
+        method: 'DELETE',
+      })
+      .then(response => {
+        if (response.ok) {
+          alert('Product deleted successfully');
+          window.location.href = '/product-listing';
+        } else {
+          alert('Error deleting product');
+        }
+      });
+    }
+  });
+  
